@@ -1,0 +1,50 @@
+[
+    {
+        "id_kategori": 1,
+        "nama_kategori": "Remote",
+        "created_at": "2022-01-01T00:00:00.000Z",
+        "updated_at": "2022-01-01T00:00:00.000Z"
+    },
+    {
+        "id_kategori": 2,
+        "nama_kategori": "Kabel & Adaptor",
+        "created_at": "2022-01-01T00:00:00.000Z",
+        "updated_at": "2022-01-01T00:00:00.000Z"
+    },
+    {
+        "id_kategori": 3,
+        "nama_kategori": "Audio",
+        "created_at": "2022-01-01T00:00:00.000Z",
+        "updated_at": "2022-01-01T00:00:00.000Z"
+    },
+    {
+        "id_kategori": 4,
+        "nama_kategori": "Lampu",
+        "created_at": "2022-01-01T00:00:00.000Z",
+        "updated_at": "2022-01-01T00:00:00.000Z"
+    },
+    {
+        "id_kategori": 5,
+        "nama_kategori": "Power Bank",
+        "created_at": "2022-01-01T00:00:00.000Z",
+        "updated_at": "2022-01-01T00:00:00.000Z"
+    },
+    {
+        "id_kategori": 6,
+        "nama_kategori": "Penyimpanan",
+        "created_at": "2022-01-01T00:00:00.000Z",
+        "updated_at": "2022-01-01T00:00:00.000Z"
+    },
+    {
+        "id_kategori": 7,
+        "nama_kategori": "Aksesori Komputer",
+        "created_at": "2022-01-01T00:00:00.000Z",
+        "updated_at": "2022-01-01T00:00:00.000Z"
+    },
+    {
+        "id_kategori": 8,
+        "nama_kategori": "Aksesori HP",
+        "created_at": "2022-01-01T00:00:00.000Z",
+        "updated_at": "2022-01-01T00:00:00.000Z"
+    }
+]

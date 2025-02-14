@@ -1,0 +1,38 @@
+[
+    {
+      "id": 1,
+      "image": "https://example.com/images/product1.jpg",
+      "name": "Screwdriver Set",
+      "quantity": 350,
+      "price": 75000
+    },
+    {
+      "id": 2,
+      "image": "https://example.com/images/product2.jpg",
+      "name": "Digital Multimeter",
+      "quantity": 250,
+      "price": 150000
+    },
+    {
+      "id": 3,
+      "image": "https://example.com/images/product3.jpg",
+      "name": "Soldering Iron",
+      "quantity": 300,
+      "price": 50000
+    },
+    {
+      "id": 4,
+      "image": "https://example.com/images/product4.jpg",
+      "name": "PCB Board Set",
+      "quantity": 200,
+      "price": 30000
+    },
+    {
+      "id": 5,
+      "image": "https://example.com/images/product5.jpg",
+      "name": "Battery Tester",
+      "quantity": 180,
+      "price": 60000
+    }
+  ]
+  

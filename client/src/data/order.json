@@ -1,0 +1,47 @@
+[
+    {
+        "id_pesanan": 1,
+        "nama_pembeli": "Budi",
+        "total_harga": 150000,
+        "uang_bayar": 200000,
+        "kembalian": 50000,
+        "metode_pembayaran_id": 1,
+        "waktu_pesanan": "2022-01-01T00:00:00.000Z"
+    },
+    {
+        "id_pesanan": 2,
+        "nama_pembeli": "Siti",
+        "total_harga": 250000,
+        "uang_bayar": 300000,
+        "kembalian": 50000,
+        "metode_pembayaran_id": 2,
+        "waktu_pesanan": "2022-01-02T10:00:00.000Z"
+    },
+    {
+        "id_pesanan": 3,
+        "nama_pembeli": "Andi",
+        "total_harga": 100000,
+        "uang_bayar": 100000,
+        "kembalian": 0,
+        "metode_pembayaran_id": 1,
+        "waktu_pesanan": "2022-01-03T15:30:00.000Z"
+    },
+    {
+        "id_pesanan": 4,
+        "nama_pembeli": "Rina",
+        "total_harga": 175000,
+        "uang_bayar": 200000,
+        "kembalian": 25000,
+        "metode_pembayaran_id": 3,
+        "waktu_pesanan": "2022-01-04T18:45:00.000Z"
+    },
+    {
+        "id_pesanan": 5,
+        "nama_pembeli": "Dedi",
+        "total_harga": 500000,
+        "uang_bayar": 500000,
+        "kembalian": 0,
+        "metode_pembayaran_id": 2,
+        "waktu_pesanan": "2022-01-05T12:20:00.000Z"
+    }
+]

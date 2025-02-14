@@ -1,0 +1,14 @@
+[
+    {
+        "id_metode_pembayaran": 1,
+        "nama_metode_pembayaran": "Tunai"
+    },
+    {
+        "id_metode_pembayaran": 2,
+        "nama_metode_pembayaran": "Transfer"
+    },
+    {
+        "id_metode_pembayaran": 3,
+        "nama_metode_pembayaran": "QRIS"
+    }
+]

@@ -1,0 +1,26 @@
+[
+    {
+        "id_pengeluaran": 1,
+        "nama_pengeluaran": "Beli Kabel HDMI",
+        "jumlah": 50000,
+        "waktu_pengeluaran": "2022-01-01T00:00:00.000Z"
+    },
+    {
+        "id_pengeluaran": 2,
+        "nama_pengeluaran": "Beli Adaptor Charger",
+        "jumlah": 120000,
+        "waktu_pengeluaran": "2022-01-02T10:00:00.000Z"
+    },
+    {
+        "id_pengeluaran": 3,
+        "nama_pengeluaran": "Beli Speaker Bluetooth",
+        "jumlah": 150000,
+        "waktu_pengeluaran": "2022-01-03T15:30:00.000Z"
+    },
+    {
+        "id_pengeluaran": 4,
+        "nama_pengeluaran": "Beli Kipas Angin USB",
+        "jumlah": 60000,
+        "waktu_pengeluaran": "2022-01-04T18:45:00.000Z"
+    }
+]
