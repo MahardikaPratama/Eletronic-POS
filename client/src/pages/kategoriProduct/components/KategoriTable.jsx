@@ -20,12 +20,12 @@ const KategoriTable = ({ data, onEdit, onDelete, startIndex = 0 }) => {
                 <tbody>
                     {data.length > 0 ? (
                         data.map((kategori, index) => (
-                            <tr key={kategori.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            <tr key={kategori.id_kategori} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                 <td className="px-6 py-4">
                                     {startIndex + index + 1}
                                 </td>
                                 <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                                    {kategori.name}
+                                    {kategori.nama_kategori}
                                 </td>
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex items-center justify-end space-x-3">

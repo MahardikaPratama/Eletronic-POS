@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 
-const FilterArea = ({ onAdd, onSearch, searchTerm, onFilterChange, filterKategori, categories }) => {
+const FilterArea = ({ onAdd, onSearch, searchTerm, onFilterChange, filterKategori, categories, onItemsPerPageChange, itemsPerPage }) => {
     const handleSearchChange = (e) => {
         onSearch(e.target.value);
     };
@@ -9,9 +9,13 @@ const FilterArea = ({ onAdd, onSearch, searchTerm, onFilterChange, filterKategor
         onFilterChange(e.target.value);
     };
 
+    const handleItemsPerPageChange = (e) => {
+        onItemsPerPageChange(Number(e.target.value));
+    };
+
     return (
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-4">
-            <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+        <div className="flex flex-col items-start justify-between gap-4 mb-4 lg:flex-row lg:items-center">
+            <div className="flex flex-col w-full gap-3 sm:flex-row lg:w-auto">
                 <div className="relative w-full sm:w-auto">
                     <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
@@ -23,7 +27,7 @@ const FilterArea = ({ onAdd, onSearch, searchTerm, onFilterChange, filterKategor
                         id="product-search" 
                         value={searchTerm}
                         onChange={handleSearchChange}
-                        className="block p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg w-full sm:w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                        className="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg sm:w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
                         placeholder="Search products (name or code)" 
                     />
                 </div>
@@ -41,6 +45,20 @@ const FilterArea = ({ onAdd, onSearch, searchTerm, onFilterChange, filterKategor
                                 {category.name}
                             </option>
                         ))}
+                    </select>
+                </div>
+
+                <div className="w-full sm:w-auto">
+                    <select 
+                        id="items-per-page" 
+                        value={itemsPerPage} 
+                        onChange={handleItemsPerPageChange}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    >
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
                     </select>
                 </div>
             </div>
@@ -65,7 +83,9 @@ FilterArea.propTypes = {
     categories: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.number.isRequired,
         name: PropTypes.string.isRequired
-    })).isRequired
+    })).isRequired,
+    onItemsPerPageChange: PropTypes.func.isRequired,
+    itemsPerPage: PropTypes.number.isRequired
 };
 
 export default FilterArea; 

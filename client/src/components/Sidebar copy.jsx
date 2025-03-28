@@ -8,7 +8,7 @@ import "../styles/sidebar.css";
 
 const Sidebar = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [activeLink, setActiveLink] = useState("");
+    const [activeLink, setActiveLink] = useState("dashboard");
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
@@ -49,7 +49,7 @@ const Sidebar = () => {
                                     ></path>
                                 </svg>
                             </button>
-                            <a href="/dashboard" className="flex ms-2 md:me-24">
+                            <a href="#" className="flex ms-2 md:me-24">
                                 <FaStore className="h-8 text-gray-950 me-3" />
                                 <span className="self-center text-xl font-semibold text-gray-950 sm:text-2xl">
                                     Bubun Eletronik

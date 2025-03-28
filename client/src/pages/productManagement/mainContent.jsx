@@ -146,7 +146,7 @@ const MainContent = () => {
 
     return (
         <div className="p-4 md:p-10">
-            <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+            <div className="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
                 <div className="p-4">
                     <FilterArea 
                         onAdd={handleAdd} 
@@ -187,7 +187,7 @@ const MainContent = () => {
             {/* Overlay */}
             {isAnyDrawerOpen && (
                 <div 
-                    className="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity z-30"
+                    className="fixed inset-0 z-30 transition-opacity bg-gray-900 bg-opacity-50"
                     onClick={handleCloseDrawers}
                 />
             )}

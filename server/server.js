@@ -1,18 +1,32 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
-const kategoriProdukRoutes = require('./app/routes/kategoriProdukRoute');
-// const produkRoutes = require('./app/routes/produkRoute');
-// const pengeluaranRoutes = require('./app/routes/pengeluaranRoute');
-// const transaksiRoutes = require('./app/routes/transaksiRoute');
-// const detailTransaksiRoutes = require('./app/routes/detailTransaksiRoute');
+
+// Konfigurasi CORS yang lebih spesifik
+const corsOptions = {
+  origin: 'http://localhost:5173', // Sesuaikan dengan URL frontend
+  credentials: true, // Penting untuk withCredentials
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+};
+
+app.use(cors(corsOptions));
+
+// Middleware untuk handle preflight requests
+app.options('*', cors(corsOptions));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use('/kategori-produk', kategoriProdukRoutes);
-// app.use('/produk', produkRoutes);
-// app.use('/pengeluaran', pengeluaranRoutes);
-// app.use('/transaksi', transaksiRoutes);
-// app.use('/detail-transaksi', detailTransaksiRoutes);
+// Routes
+const kategoriProdukRoutes = require('./app/routes/kategoriProdukRoute');
+app.use('/api/v1/kategori-produk', kategoriProdukRoutes);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

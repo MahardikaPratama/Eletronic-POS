@@ -1,13 +1,17 @@
 import PropTypes from 'prop-types';
 
-const FilterArea = ({ onAdd, onSearch, searchTerm }) => {
+const FilterArea = ({ onAdd, onSearch, searchTerm, onItemsPerPageChange, itemsPerPage }) => {
     const handleSearchChange = (e) => {
         onSearch(e.target.value);
     };
 
+    const handleItemsPerPageChange = (e) => {
+        onItemsPerPageChange(Number(e.target.value));
+    };
+
     return (
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
-            <form className="flex items-center w-full sm:w-auto mb-4 sm:mb-0" onSubmit={(e) => e.preventDefault()}>
+        <div className="flex flex-col items-center justify-between mb-4 sm:flex-row">
+            <form className="flex items-center w-full gap-3 mb-4 sm:w-auto sm:mb-0" onSubmit={(e) => e.preventDefault()}>
                 <label htmlFor="table-search" className="sr-only">Search</label>
                 <div className="relative">
                     <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -24,6 +28,20 @@ const FilterArea = ({ onAdd, onSearch, searchTerm }) => {
                         placeholder="Search for kategori" 
                     />
                 </div>
+
+                <div className="w-full sm:w-auto">
+                    <select 
+                        id="items-per-page" 
+                        value={itemsPerPage} 
+                        onChange={handleItemsPerPageChange}
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    >
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
             </form>
             <button 
                 onClick={onAdd} 
@@ -39,7 +57,9 @@ const FilterArea = ({ onAdd, onSearch, searchTerm }) => {
 FilterArea.propTypes = {
     onAdd: PropTypes.func.isRequired,
     onSearch: PropTypes.func.isRequired,
-    searchTerm: PropTypes.string
+    searchTerm: PropTypes.string,
+    onItemsPerPageChange: PropTypes.func.isRequired,
+    itemsPerPage: PropTypes.number.isRequired
 };
 
 export default FilterArea; 
