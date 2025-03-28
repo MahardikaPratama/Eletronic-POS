@@ -20,7 +20,10 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 const kategoriProdukRoutes = require('./app/routes/kategoriProdukRoute');
+const produkRoutes = require('./app/routes/produkRoute');
+
 app.use('/api/v1/kategori-produk', kategoriProdukRoutes);
+app.use('/api/v1/produk', produkRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

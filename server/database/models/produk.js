@@ -3,9 +3,14 @@ module.exports = (sequelize, DataTypes) => {
     const Produk = sequelize.define(
         "Produk",
         {
+            id_barang: {
+                type: DataTypes.INTEGER,
+                autoIncrement: true,
+                primaryKey: true,
+            },
             kode_barang: {
                 type: DataTypes.STRING(50),
-                primaryKey: true,
+                unique: true,
             },
             nama_barang: {
                 type: DataTypes.STRING(150),
@@ -45,7 +50,7 @@ module.exports = (sequelize, DataTypes) => {
     Produk.associate = (models) => {
         Produk.belongsTo(models.KategoriProduk, { foreignKey: "id_kategori" });
         Produk.hasMany(models.DetailTransaksi, {
-            foreignKey: "kode_barang",
+            foreignKey: "id_barang",
             onDelete: "CASCADE",
         });
     };
