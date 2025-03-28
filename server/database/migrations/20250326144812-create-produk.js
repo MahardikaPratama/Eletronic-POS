@@ -34,6 +34,11 @@ module.exports = {
         allowNull: false,
         defaultValue: 0
       },
+      batas_grosir: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 10
+      },
       id_kategori: {
         type: Sequelize.INTEGER,
         references: {

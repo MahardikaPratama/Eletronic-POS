@@ -9,9 +9,10 @@
   "test": {
     "username": "root",
     "password": "dika1708",
-    "database": "eletronic_pos",
+    "database": "elektronik_pos_test",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql",
+    "logging": false
   },
   "production": {
     "username": "root",

@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     KategoriProduk.associate = (models) => {
         KategoriProduk.hasMany(models.Produk, {
             foreignKey: "id_kategori",
+            as: "produk",
             onDelete: "SET NULL",
         });
     };

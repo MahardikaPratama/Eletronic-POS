@@ -37,6 +37,9 @@ const ProductTable = ({ data, onEdit, onDelete, startIndex = 0 }) => {
                             Harga Grosir
                         </th>
                         <th scope="col" className="px-6 py-3">
+                            Batas Grosir
+                        </th>
+                        <th scope="col" className="px-6 py-3">
                             Harga Jual
                         </th>
                         <th scope="col" className="px-6 py-3 text-right">
@@ -47,7 +50,7 @@ const ProductTable = ({ data, onEdit, onDelete, startIndex = 0 }) => {
                 <tbody>
                     {data.length > 0 ? (
                         data.map((product, index) => (
-                            <tr key={product.kode_barang} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                            <tr key={product.id_barang} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                                 <td className="px-6 py-4">
                                     {startIndex + index + 1}
                                 </td>
@@ -58,7 +61,7 @@ const ProductTable = ({ data, onEdit, onDelete, startIndex = 0 }) => {
                                     {product.nama_barang}
                                 </td>
                                 <td className="px-6 py-4">
-                                    {product.kategori}
+                                    {product.kategori.nama_kategori}
                                 </td>
                                 <td className="px-6 py-4">
                                     {product.stok}
@@ -68,6 +71,9 @@ const ProductTable = ({ data, onEdit, onDelete, startIndex = 0 }) => {
                                 </td>
                                 <td className="px-6 py-4">
                                     {formatCurrency(product.harga_grosir)}
+                                </td>
+                                <td className="px-6 py-4">
+                                    {product.batas_grosir}
                                 </td>
                                 <td className="px-6 py-4">
                                     {formatCurrency(product.harga_jual)}

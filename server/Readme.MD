@@ -103,3 +103,6 @@ MIT License. Silakan gunakan dan modifikasi sesuai kebutuhan.
 ---
 Jika ada kendala atau pertanyaan, silakan hubungi tim pengembang! 🚀
 
+
+<!-- Migrasi ulang database -->
+npx sequelize-cli db:drop && npx sequelize-cli db:create && npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all

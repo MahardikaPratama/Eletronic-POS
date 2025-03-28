@@ -1,6 +1,10 @@
+import { useState, useEffect } from 'react';
+import KategoriProdukDataService from '../../../services/kategoriProduk.service';
 import PropTypes from 'prop-types';
 
-const FilterArea = ({ onAdd, onSearch, searchTerm, onFilterChange, filterKategori, categories, onItemsPerPageChange, itemsPerPage }) => {
+
+const FilterArea = ({ onAdd, onSearch, searchTerm, onFilterChange, filterKategori, onItemsPerPageChange, itemsPerPage }) => {
+    const [categories, setCategories] = useState([]);
     const handleSearchChange = (e) => {
         onSearch(e.target.value);
     };
@@ -12,6 +16,20 @@ const FilterArea = ({ onAdd, onSearch, searchTerm, onFilterChange, filterKategor
     const handleItemsPerPageChange = (e) => {
         onItemsPerPageChange(Number(e.target.value));
     };
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
+
+    const fetchCategories = async () => {
+        try {
+            const response = await KategoriProdukDataService.getAll();
+            setCategories(response.data.data);
+        } catch (error) {
+            alert(error.response?.data?.message || "Gagal mengambil data kategori");
+            console.error('Error fetching data:', error);
+        }
+    }
 
     return (
         <div className="flex flex-col items-start justify-between gap-4 mb-4 lg:flex-row lg:items-center">
@@ -41,8 +59,8 @@ const FilterArea = ({ onAdd, onSearch, searchTerm, onFilterChange, filterKategor
                     >
                         <option value="">All Categories</option>
                         {categories.map(category => (
-                            <option key={category.id} value={category.id}>
-                                {category.name}
+                            <option key={category.id_kategori} value={category.id_kategori}>
+                                {category.nama_kategori}
                             </option>
                         ))}
                     </select>

@@ -1,86 +1,38 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
+import Produk from '../../services/produk.service';
 import FilterArea from './components/FilterArea';
 import ProductTable from './components/ProductTable';
 import AddProductDrawer from './components/AddProductDrawer';
 import EditProductDrawer from './components/EditProductDrawer';
-import DeleteProductDrawer from './components/DeleteProductDrawer';
 import Pagination from '../../components/Pagination';
 import PropTypes from 'prop-types';
 
-const ITEMS_PER_PAGE = 5;
 
 const MainContent = () => {
-    // Sample data
-    const data = [
-        {
-            kode_barang: 'PRD001', 
-            nama_barang: 'Laptop Asus', 
-            harga_grosir: 9000000, 
-            harga_jual: 10500000, 
-            harga_modal: 8500000, 
-            stok: 15, 
-            id_kategori: 1,
-            kategori: 'Elektronik'
-        },
-        {
-            kode_barang: 'PRD002', 
-            nama_barang: 'Smartphone Samsung', 
-            harga_grosir: 4500000, 
-            harga_jual: 5300000, 
-            harga_modal: 4000000, 
-            stok: 25, 
-            id_kategori: 1,
-            kategori: 'Elektronik'
-        },
-        {
-            kode_barang: 'PRD003', 
-            nama_barang: 'Headphone Sony', 
-            harga_grosir: 800000, 
-            harga_jual: 1000000, 
-            harga_modal: 600000, 
-            stok: 30, 
-            id_kategori: 2,
-            kategori: 'Aksesoris'
-        },
-        {
-            kode_barang: 'PRD004', 
-            nama_barang: 'Mouse Logitech', 
-            harga_grosir: 150000, 
-            harga_jual: 200000, 
-            harga_modal: 120000, 
-            stok: 50, 
-            id_kategori: 2,
-            kategori: 'Aksesoris'
-        },
-        {
-            kode_barang: 'PRD005', 
-            nama_barang: 'Monitor LG', 
-            harga_grosir: 2000000, 
-            harga_jual: 2500000, 
-            harga_modal: 1800000, 
-            stok: 10, 
-            id_kategori: 1,
-            kategori: 'Elektronik'
-        },
-        {
-            kode_barang: 'PRD006', 
-            nama_barang: 'Keyboard Mechanical', 
-            harga_grosir: 500000, 
-            harga_jual: 650000, 
-            harga_modal: 450000, 
-            stok: 20, 
-            id_kategori: 2,
-            kategori: 'Aksesoris'
-        }
-    ];
-
+    const [data, setData] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
     const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
-    const [isDeleteDrawerOpen, setIsDeleteDrawerOpen] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [filterKategori, setFilterKategori] = useState('');
+
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const fetchData = async () => {
+        try {
+            const response = await Produk.getAll();
+            setData(response.data.data);
+        } catch (error) {
+            alert(error.response?.data?.message || "Gagal mengambil data produk");
+            console.error('Error fetching data:', error);
+        }
+    };
 
     // Filter data based on search term and kategori
     const filteredData = data.filter(item => {
@@ -96,9 +48,9 @@ const MainContent = () => {
         return matchesSearch && matchesKategori;
     });
 
-    const totalPages = Math.ceil(filteredData.length / ITEMS_PER_PAGE);
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    const endIndex = startIndex + ITEMS_PER_PAGE;
+    const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
     const currentData = filteredData.slice(startIndex, endIndex);
 
     const handleEdit = (product) => {
@@ -106,9 +58,29 @@ const MainContent = () => {
         setIsEditDrawerOpen(true);
     };
 
-    const handleDelete = (product) => {
+    const handleDelete = async (product) => {
         setSelectedProduct(product);
-        setIsDeleteDrawerOpen(true);
+
+        Swal.fire({
+            title: 'Apakah Anda yakin?',
+            text: `Produk "${product.nama_barang}" akan dihapus secara permanen!`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, hapus!',
+            cancelButtonText: 'Batal',
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    await Produk.delete(product.id_barang);
+                    fetchData();
+                    Swal.fire('Dihapus!', 'Produk telah berhasil dihapus.', 'success');
+                } catch (error) {
+                    Swal.fire('Error!', error.response?.data?.message || 'Terjadi kesalahan saat menghapus produk.', 'error');
+                }
+            }
+        });
     };
 
     const handleAdd = () => {
@@ -118,7 +90,6 @@ const MainContent = () => {
     const handleCloseDrawers = () => {
         setIsAddDrawerOpen(false);
         setIsEditDrawerOpen(false);
-        setIsDeleteDrawerOpen(false);
         setSelectedProduct(null);
     };
 
@@ -131,30 +102,30 @@ const MainContent = () => {
         setCurrentPage(1); // Reset to first page when searching
     };
 
+    const handleItemsPerPageChange = (value) => {
+        setItemsPerPage(value);
+        setCurrentPage(1); // Reset to first page when changing items per page
+    };
+
     const handleFilterChange = (kategoriId) => {
         setFilterKategori(kategoriId);
         setCurrentPage(1); // Reset to first page when filtering
     };
 
-    const isAnyDrawerOpen = isAddDrawerOpen || isEditDrawerOpen || isDeleteDrawerOpen;
 
-    // List of all available categories for the filter
-    const categories = [
-        { id: 1, name: 'Elektronik' },
-        { id: 2, name: 'Aksesoris' }
-    ];
+    const isAnyDrawerOpen = isAddDrawerOpen || isEditDrawerOpen;
 
     return (
-        <div className="p-4 md:p-10">
+        <div className="flex-1 p-1 md:p-3">
             <div className="relative overflow-hidden bg-white shadow-md dark:bg-gray-800 sm:rounded-lg">
-                <div className="p-4">
+                <div className="p-2 sm:p-3">
                     <FilterArea 
                         onAdd={handleAdd} 
                         onSearch={handleSearch}
                         searchTerm={searchTerm}
                         onFilterChange={handleFilterChange}
+                        onItemsPerPageChange={handleItemsPerPageChange}
                         filterKategori={filterKategori}
-                        categories={categories} 
                     />
                 </div>
                 <ProductTable 
@@ -164,24 +135,21 @@ const MainContent = () => {
                     startIndex={startIndex}
                 />
                 
-                {filteredData.length > 0 ? (
+                {filteredData.length > 0 && (
                     <div className="p-4">
                         <Pagination 
                             currentPage={currentPage}
                             totalPages={totalPages}
                             onPageChange={handlePageChange}
-                            itemsPerPage={ITEMS_PER_PAGE}
+                            itemsPerPage={itemsPerPage}
                             totalItems={filteredData.length}
                             showInfo={true}
                             showPreviousNext={true}
                             maxVisiblePages={5}
                         />
                     </div>
-                ) : (
-                    <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-                        No data found
-                    </div>
                 )}
+                
             </div>
             
             {/* Overlay */}
@@ -191,23 +159,17 @@ const MainContent = () => {
                     onClick={handleCloseDrawers}
                 />
             )}
-
-            {/* Drawers */}
+            
             <AddProductDrawer 
                 isOpen={isAddDrawerOpen} 
                 onClose={handleCloseDrawers}
-                categories={categories}
+                onSuccess={fetchData}
             />
             <EditProductDrawer 
                 product={selectedProduct} 
                 isOpen={isEditDrawerOpen}
                 onClose={handleCloseDrawers}
-                categories={categories}
-            />
-            <DeleteProductDrawer 
-                product={selectedProduct} 
-                isOpen={isDeleteDrawerOpen}
-                onClose={handleCloseDrawers}
+                onSuccess={fetchData}
             />
         </div>
     );

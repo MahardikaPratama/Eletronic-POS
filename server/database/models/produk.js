@@ -33,6 +33,11 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
                 defaultValue: 0,
             },
+            batas_grosir: {
+                type: DataTypes.INTEGER,
+                allowNull: false,
+                defaultValue: 10,
+            },
             id_kategori: {
                 type: DataTypes.INTEGER,
                 references: {
@@ -48,7 +53,10 @@ module.exports = (sequelize, DataTypes) => {
     );
 
     Produk.associate = (models) => {
-        Produk.belongsTo(models.KategoriProduk, { foreignKey: "id_kategori" });
+        Produk.belongsTo(models.KategoriProduk, {
+            foreignKey: "id_kategori",
+            as: "kategori", 
+        });
         Produk.hasMany(models.DetailTransaksi, {
             foreignKey: "id_barang",
             onDelete: "CASCADE",

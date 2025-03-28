@@ -1,7 +1,10 @@
 import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
+import Swal from 'sweetalert2';
+import Produk from '../../../services/produk.service';
+import KategoriProdukDataService from '../../../services/kategoriProduk.service';
 
-const EditProductDrawer = ({ isOpen, onClose, product, categories }) => {
+const EditProductDrawer = ({ product, isOpen, onClose, onSuccess }) => {
     const [formData, setFormData] = useState({
         kode_barang: '',
         nama_barang: '',
@@ -9,8 +12,12 @@ const EditProductDrawer = ({ isOpen, onClose, product, categories }) => {
         harga_jual: '',
         harga_modal: '',
         stok: '',
+        batas_grosir: '',
         id_kategori: ''
     });
+    const [loading, setLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [categories, setCategories] = useState([]);
 
     // Update form data when product changes
     useEffect(() => {
@@ -22,10 +29,64 @@ const EditProductDrawer = ({ isOpen, onClose, product, categories }) => {
                 harga_jual: product.harga_jual,
                 harga_modal: product.harga_modal,
                 stok: product.stok,
+                batas_grosir: product.batas_grosir,
                 id_kategori: product.id_kategori
             });
+            setErrorMessage('');
         }
-    }, [product]);
+        fetchCategories();
+    }, [product], []);
+
+    const fetchCategories = async () => {
+        try {
+            const response = await KategoriProdukDataService.getAll();
+            setCategories(response.data.data);
+        } catch (error) {
+            alert(error.response?.data?.message || "Gagal mengambil data kategori");
+            console.error('Error fetching data:', error);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!formData.kode_barang.trim() || !formData.nama_barang.trim() || !formData.id_kategori) {
+            setErrorMessage('Tolong isi semua fields.');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Oops...',
+                text: 'Tolong isi semua field!',
+            });
+            return;
+        }
+
+        setLoading(true);
+        setErrorMessage('');
+
+        try {
+            const response = await Produk.update(product.id_barang, formData);
+            console.log('Produk berhasil diperbarui:', response.data);
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil!',
+                text: 'Produk berhasil diperbarui.',
+                timer: 2000,
+                showConfirmButton: false,
+            });
+            onSuccess();
+            onClose();
+        } catch (error) {
+            console.error('Gagal memperbarui produk:', error);
+            setErrorMessage(error.response?.data?.message || 'Terjadi kesalahan.');
+
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal!',
+                text: error.response?.data?.message || 'Terjadi kesalahan saat memperbarui produk.',
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -35,13 +96,6 @@ const EditProductDrawer = ({ isOpen, onClose, product, categories }) => {
                 (value === '' ? '' : Number(value)) : 
                 value
         }));
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Here you would send the data to the server
-        console.log('Product updated:', formData);
-        onClose();
     };
 
     return (
@@ -102,25 +156,44 @@ const EditProductDrawer = ({ isOpen, onClose, product, categories }) => {
                         />
                     </div>
                     
-                    <div>
-                        <label htmlFor="id_kategori" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                            Kategori <span className="text-red-500">*</span>
-                        </label>
-                        <select 
-                            id="id_kategori" 
-                            name="id_kategori"
-                            value={formData.id_kategori}
-                            onChange={handleChange}
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            required
-                        >
-                            <option value="">Select a category</option>
-                            {categories.map(category => (
-                                <option key={category.id} value={category.id}>
-                                    {category.name}
-                                </option>
-                            ))}
-                        </select>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label htmlFor="id_kategori" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                Kategori <span className="text-red-500">*</span>
+                            </label>
+                            <select 
+                                id="id_kategori" 
+                                name="id_kategori"
+                                value={formData.id_kategori} // Gunakan id_kategori, bukan nama_kategori
+                                onChange={handleChange}
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                required
+                            >
+                                <option value="">Select a category</option>
+                                {categories.map(category => (
+                                    <option key={category.id_kategori} value={category.id_kategori}>
+                                        {category.nama_kategori}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div>
+                            <label htmlFor="stok" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                Stok <span className="text-red-500">*</span>
+                            </label>
+                            <input 
+                                type="number" 
+                                id="stok" 
+                                name="stok"
+                                value={formData.stok}
+                                onChange={handleChange}
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                                placeholder="15" 
+                                required
+                                min="0"
+                            />
+                        </div>
                     </div>
                     
                     <div className="grid grid-cols-2 gap-4">
@@ -146,24 +219,30 @@ const EditProductDrawer = ({ isOpen, onClose, product, categories }) => {
                             </div>
                         </div>
                         
+
                         <div>
-                            <label htmlFor="stok" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                Stok <span className="text-red-500">*</span>
+                            <label htmlFor="harga_jual" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                Harga Jual <span className="text-red-500">*</span>
                             </label>
-                            <input 
-                                type="number" 
-                                id="stok" 
-                                name="stok"
-                                value={formData.stok}
-                                onChange={handleChange}
-                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-                                placeholder="15" 
-                                required
-                                min="0"
-                            />
+                            <div className="flex">
+                                <span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
+                                    Rp
+                                </span>
+                                <input 
+                                    type="number" 
+                                    id="harga_jual" 
+                                    name="harga_jual"
+                                    value={formData.harga_jual}
+                                    onChange={handleChange}
+                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                                    placeholder="10500000" 
+                                    required
+                                    min="0"
+                                />
+                            </div>
                         </div>
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-4">
                         <div>
                             <label htmlFor="harga_grosir" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
@@ -188,35 +267,33 @@ const EditProductDrawer = ({ isOpen, onClose, product, categories }) => {
                         </div>
                         
                         <div>
-                            <label htmlFor="harga_jual" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                                Harga Jual <span className="text-red-500">*</span>
+                            <label htmlFor="batas_grosir" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                Batas Grosir <span className="text-red-500">*</span>
                             </label>
-                            <div className="flex">
-                                <span className="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
-                                    Rp
-                                </span>
-                                <input 
-                                    type="number" 
-                                    id="harga_jual" 
-                                    name="harga_jual"
-                                    value={formData.harga_jual}
-                                    onChange={handleChange}
-                                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-r-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
-                                    placeholder="10500000" 
-                                    required
-                                    min="0"
-                                />
-                            </div>
+                            <input 
+                                type="number" 
+                                id="batas_grosir" 
+                                name="batas_grosir"
+                                value={formData.batas_grosir}
+                                onChange={handleChange}
+                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" 
+                                placeholder="10" 
+                                required
+                                min="0"
+                            />
                         </div>
                     </div>
                 </div>
+
+                {errorMessage && <p className="mb-4 text-sm text-red-500">{errorMessage}</p>}
                 
                 <div className="bottom-0 left-0 flex justify-center w-full pb-4 mt-6 space-x-4">
                     <button 
                         type="submit" 
+                        disabled={loading}
                         className="text-white w-full justify-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                     >
-                        Update product
+                        {loading ? 'Updating...' : 'Update Product'}
                     </button>
                     <button 
                         type="button" 
@@ -235,19 +312,17 @@ EditProductDrawer.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     product: PropTypes.shape({
+        id_barang: PropTypes.number.isRequired,
         kode_barang: PropTypes.string.isRequired,
         nama_barang: PropTypes.string.isRequired,
         harga_grosir: PropTypes.number.isRequired,
         harga_jual: PropTypes.number.isRequired,
         harga_modal: PropTypes.number.isRequired,
         stok: PropTypes.number.isRequired,
+        batas_grosir: PropTypes.number.isRequired,
         id_kategori: PropTypes.number.isRequired,
-        kategori: PropTypes.string.isRequired
     }),
-    categories: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        name: PropTypes.string.isRequired
-    })).isRequired
+    onSuccess: PropTypes.func.isRequired
 };
 
 export default EditProductDrawer; 

@@ -1,9 +1,17 @@
+const { where } = require("sequelize");
 const { KategoriProduk, Produk } = require("../../database/models");
 
 exports.getAllProduk = async (req, res) => {
     try {
         const produk = await Produk.findAll({
-            order: [['updatedAt', 'DESC']], // Mengurutkan berdasarkan createdAt dari yang terbaru
+            include: [
+                {
+                    model: KategoriProduk,
+                    as: "kategori", // Sesuai dengan alias di model
+                    attributes: ["nama_kategori"], // Ambil hanya nama kategori
+                },
+            ],
+            order: [["updatedAt", "DESC"]],
         });
         res.json({
             success: true,
@@ -21,7 +29,7 @@ exports.getAllProduk = async (req, res) => {
 
 exports.createProduk = async (req, res) => {
     try {
-        const { kode_barang, nama_barang, harga_grosir, harga_jual, harga_modal, stok, nama_kategori } = req.body;
+        const { kode_barang, nama_barang, harga_grosir, harga_jual, harga_modal, stok, batas_grosir, id_kategori } = req.body;
 
         // Validasi input
         // Kode barang tidak boleh kosong
@@ -73,10 +81,18 @@ exports.createProduk = async (req, res) => {
         }
 
         // Nama kategori tidak boleh kosong
-        if (!nama_kategori || nama_kategori.trim() === "") {
+        if (!id_kategori || id_kategori.trim() === "") {
             return res.status(400).json({
                 success: false,
-                message: "Nama kategori tidak boleh kosong"
+                message: "kategori tidak boleh kosong"
+            });
+        }
+
+        // cek batas grosir
+        if (!batas_grosir || batas_grosir <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Batas Grosir tidak boleh kosong dan harus lebih besar dari 0"
             });
         }
 
@@ -89,17 +105,6 @@ exports.createProduk = async (req, res) => {
             });
         }
 
-        // Dapatkan id_kategori dari nama_kategori
-        const kategori = await KategoriProduk.findOne({ where: { nama_kategori } });
-
-        // Jika kategori tidak ditemukan, kembalikan response error
-        if (!kategori) {
-            return res.status(404).json({
-                success: false,
-                message: "Kategori tidak ditemukan"
-            });
-        }
-
         // Buat produk baru
         const produkBaru = await Produk.create({
             kode_barang,
@@ -108,7 +113,8 @@ exports.createProduk = async (req, res) => {
             harga_jual,
             harga_modal,
             stok,
-            id_kategori: kategori.id_kategori
+            batas_grosir,
+            id_kategori
         });
 
         res.status(201).json({
@@ -129,7 +135,7 @@ exports.createProduk = async (req, res) => {
 exports.updateProduk = async (req, res) => {
     try {
         const { id } = req.params;
-        const { kode_barang, nama_barang, harga_grosir, harga_jual, harga_modal, stok, nama_kategori } = req.body;
+        const { kode_barang, nama_barang, harga_grosir, harga_jual, harga_modal, stok, batas_grosir, id_kategori } = req.body;
 
         // Validasi input
         // Kode barang tidak boleh kosong
@@ -181,10 +187,18 @@ exports.updateProduk = async (req, res) => {
         }
 
         // Nama kategori tidak boleh kosong
-        if (!nama_kategori || nama_kategori.trim() === "") {
+        if (!id_kategori) {
             return res.status(400).json({
                 success: false,
-                message: "Nama kategori tidak boleh kosong"
+                message: "kategori tidak boleh kosong"
+            });
+        }
+
+        // cek batas grosir
+        if (!batas_grosir || batas_grosir <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Batas Grosir tidak boleh kosong dan harus lebih besar dari 0"
             });
         }
 
@@ -197,17 +211,6 @@ exports.updateProduk = async (req, res) => {
             });
         }
 
-        // Dapatkan id_kategori dari nama_kategori
-        const kategori = await KategoriProduk.findOne({ where: { nama_kategori } });
-
-        // Jika kategori tidak ditemukan, kembalikan response error
-        if (!kategori) {
-            return res.status(404).json({
-                success: false,
-                message: "Kategori tidak ditemukan"
-            });
-        }
-
         // Update produk
         produk.kode_barang = kode_barang;
         produk.nama_barang = nama_barang;
@@ -215,7 +218,8 @@ exports.updateProduk = async (req, res) => {
         produk.harga_jual = harga_jual;
         produk.harga_modal = harga_modal;
         produk.stok = stok;
-        produk.id_kategori = kategori.id_kategori;
+        produk.batas_grosir = batas_grosir;
+        produk.id_kategori = id_kategori;
 
         await produk.save();
 
@@ -248,7 +252,7 @@ exports.deleteProduk = async (req, res) => {
         }
 
         // Hapus produk
-        await produk.destroy();
+        await produk.destroy({ where: { id_barang: id } });
 
         res.json({
             success: true,
