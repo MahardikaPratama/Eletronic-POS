@@ -137,6 +137,14 @@ exports.updateProduk = async (req, res) => {
         const { id } = req.params;
         const { kode_barang, nama_barang, harga_grosir, harga_jual, harga_modal, stok, batas_grosir, id_kategori } = req.body;
 
+        // Cek apakah produk dengan id yang diberikan ada
+        const produk = await Produk.findByPk(id);
+        if (!produk) {
+            return res.status(404).json({
+                success: false,
+                message: "Produk tidak ditemukan"
+            });
+        }
         // Validasi input
         // Kode barang tidak boleh kosong
         if (!kode_barang || kode_barang.trim() === "") {
@@ -202,14 +210,6 @@ exports.updateProduk = async (req, res) => {
             });
         }
 
-        // Cek apakah produk dengan id yang diberikan ada
-        const produk = await Produk.findByPk(id);
-        if (!produk) {
-            return res.status(404).json({
-                success: false,
-                message: "Produk tidak ditemukan"
-            });
-        }
 
         // Update produk
         produk.kode_barang = kode_barang;

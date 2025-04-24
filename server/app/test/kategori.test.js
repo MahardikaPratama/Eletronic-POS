@@ -1,155 +1,137 @@
 const request = require("supertest");
-const express = require("express");
-const bodyParser = require("body-parser");
-const kategoriRouter = require("../../app/routes/kategoriProdukRoute");
-const kategoriController = require("../../app/controllers/kategoriProdukController");
-const { KategoriProduk, sequelize } = require("../../database/models");
+const app = require("../../app"); 
+const { KategoriProduk } = require("../../database/models");
 
-const app = express();
-app.use(bodyParser.json());
-app.use("/kategori-produk", kategoriRouter);
+jest.mock("../../database/models", () => ({
+    KategoriProduk: {
+        findAll: jest.fn(),
+        findOne: jest.fn(),
+        findByPk: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        destroy: jest.fn()
+    }
+}));
 
-describe("Kategori Controller - Unit Testing", () => {
-    let mockReq, mockRes, kategoriMock;
-
-    beforeEach(() => {
-        mockReq = {};
-        mockRes = { json: jest.fn(), status: jest.fn().mockReturnThis() };
-
-        kategoriMock = {
-            id_kategori: 1,
-            nama_kategori: "Elektronik",
-            update: jest.fn().mockResolvedValue([1]), // Mock update return array [1]
-            destroy: jest.fn().mockResolvedValue(1), // Mock delete return 1
-        };
+describe("Pengujian Kategori Controller", () => {
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 
-    test("getAllKategori() harus mengembalikan daftar kategori", async () => {
-        KategoriProduk.findAll = jest.fn().mockResolvedValue([kategoriMock]);
+    describe("GET /kategori", () => {
+        it("berhasil mengambil semua data kategori", async () => {
+            KategoriProduk.findAll.mockResolvedValue([{ id_kategori: 1, nama_kategori: "Makanan" }]);
 
-        await kategoriController.getAllKategori(mockReq, mockRes);
+            const res = await request(app).get("/kategori");
 
-        expect(mockRes.json).toHaveBeenCalledWith({
-            success: true,
-            message: "Data kategori berhasil diambil",
-            data: [kategoriMock],
+            expect(res.statusCode).toBe(200);
+            expect(res.body.success).toBe(true);
+            expect(res.body.message).toBe("Data kategori berhasil diambil");
+            expect(KategoriProduk.findAll).toHaveBeenCalled();
+        });
+
+        it("gagal mengambil data kategori karena error server", async () => {
+            KategoriProduk.findAll.mockRejectedValue(new Error("Database error"));
+
+            const res = await request(app).get("/kategori");
+
+            expect(res.statusCode).toBe(500);
+            expect(res.body.success).toBe(false);
+            expect(res.body.message).toBe("Terjadi kesalahan saat mengambil data kategori");
         });
     });
 
-    test("createKategori() harus menambahkan kategori baru", async () => {
-        mockReq.body = { nama_kategori: "Smartphone" };
+    describe("POST /kategori", () => {
+        it("berhasil menambahkan kategori baru", async () => {
+            const data = { nama_kategori: "Minuman" };
+            KategoriProduk.findOne.mockResolvedValue(null);
+            KategoriProduk.create.mockResolvedValue({ id_kategori: 2, ...data });
 
-        KategoriProduk.findOne = jest.fn().mockResolvedValue(null); // Tidak ada kategori dengan nama yang sama
-        KategoriProduk.create = jest.fn().mockResolvedValue({
-            id_kategori: 2,
-            nama_kategori: "Smartphone",
+            const res = await request(app).post("/kategori").send(data);
+
+            expect(res.statusCode).toBe(201);
+            expect(res.body.success).toBe(true);
+            expect(res.body.message).toBe("Kategori berhasil ditambahkan");
         });
 
-        await kategoriController.createKategori(mockReq, mockRes);
+        it("gagal karena nama kategori kosong", async () => {
+            const res = await request(app).post("/kategori").send({ nama_kategori: " " });
 
-        expect(mockRes.status).toHaveBeenCalledWith(201);
-        expect(mockRes.json).toHaveBeenCalledWith({
-            success: true,
-            message: "Kategori berhasil ditambahkan",
-            data: {
-                id_kategori: 2,
-                nama_kategori: "Smartphone",
-            },
+            expect(res.statusCode).toBe(400);
+            expect(res.body.message).toBe("Nama kategori tidak boleh kosong");
         });
-    });
 
-    test("updateKategori() harus memperbarui kategori", async () => {
-        mockReq.params = { id: 1 };
-        mockReq.body = { nama_kategori: "Smartphone" };
+        it("gagal karena kategori sudah ada", async () => {
+            const data = { nama_kategori: "Makanan" };
+            KategoriProduk.findOne.mockResolvedValue(data);
 
-        KategoriProduk.findByPk = jest.fn().mockResolvedValue(kategoriMock);
-        KategoriProduk.findOne = jest.fn().mockResolvedValue(null); // Tidak ada kategori dengan nama yang sama
+            const res = await request(app).post("/kategori").send(data);
 
-        await kategoriController.updateKategori(mockReq, mockRes);
-
-        expect(mockRes.json).toHaveBeenCalledWith({
-            success: true,
-            message: "Kategori berhasil diperbarui",
-            data: [1], // Sequelize update method returns an array with the number of affected rows
+            expect(res.statusCode).toBe(409);
+            expect(res.body.message).toBe("Kategori sudah ada.");
         });
     });
 
-    test("deleteKategori() harus menghapus kategori", async () => {
-        mockReq.params = { id: 1 };
+    describe("PUT /kategori/:id", () => {
+        it("berhasil memperbarui kategori", async () => {
+            const id = 1;
+            const body = { nama_kategori: "Elektronik" };
 
-        KategoriProduk.findByPk = jest.fn().mockResolvedValue(kategoriMock);
+            KategoriProduk.findByPk.mockResolvedValue({ id_kategori: id });
+            KategoriProduk.findOne.mockResolvedValue(null);
+            KategoriProduk.update.mockResolvedValue([1]);
 
-        await kategoriController.deleteKategori(mockReq, mockRes);
+            const res = await request(app).put(`/kategori/${id}`).send(body);
 
-        expect(mockRes.json).toHaveBeenCalledWith({
-            success: true,
-            message: "Kategori berhasil dihapus",
+            expect(res.statusCode).toBe(200);
+            expect(res.body.message).toBe("Kategori berhasil diperbarui");
+        });
+
+        it("gagal karena nama kategori kosong", async () => {
+            const res = await request(app).put("/kategori/1").send({ nama_kategori: " " });
+
+            expect(res.statusCode).toBe(400);
+            expect(res.body.message).toBe("Nama kategori tidak boleh kosong");
+        });
+
+        it("gagal karena kategori tidak ditemukan", async () => {
+            KategoriProduk.findByPk.mockResolvedValue(null);
+
+            const res = await request(app).put("/kategori/99").send({ nama_kategori: "Fashion" });
+
+            expect(res.statusCode).toBe(404);
+            expect(res.body.message).toBe("Kategori tidak ditemukan");
+        });
+
+        it("gagal karena nama kategori sudah ada", async () => {
+            KategoriProduk.findByPk.mockResolvedValue({ id_kategori: 1 });
+            KategoriProduk.findOne.mockResolvedValue({ id_kategori: 2 });
+
+            const res = await request(app).put("/kategori/1").send({ nama_kategori: "Makanan" });
+
+            expect(res.statusCode).toBe(409);
+            expect(res.body.message).toBe("Kategori sudah ada.");
         });
     });
 
-    test("deleteKategori() harus gagal jika kategori tidak ditemukan", async () => {
-        mockReq.params = { id: 99 };
+    describe("DELETE /kategori/:id", () => {
+        it("berhasil menghapus kategori", async () => {
+            KategoriProduk.findByPk.mockResolvedValue({ id_kategori: 1 });
+            KategoriProduk.destroy.mockResolvedValue(1);
 
-        KategoriProduk.findByPk = jest.fn().mockResolvedValue(null);
+            const res = await request(app).delete("/kategori/1");
 
-        await kategoriController.deleteKategori(mockReq, mockRes);
-
-        expect(mockRes.status).toHaveBeenCalledWith(404);
-        expect(mockRes.json).toHaveBeenCalledWith({
-            success: false,
-            message: "Kategori tidak ditemukan",
+            expect(res.statusCode).toBe(200);
+            expect(res.body.message).toBe("Kategori berhasil dihapus");
         });
-    });
-});
 
-describe("Kategori API - Integration Testing", () => {
-    beforeAll(async () => {
-        await sequelize.sync({ force: true }); // Reset database untuk testing
-    });
+        it("gagal karena kategori tidak ditemukan", async () => {
+            KategoriProduk.findByPk.mockResolvedValue(null);
 
-    afterAll(async () => {
-        await sequelize.close(); // Menutup koneksi database setelah semua tes selesai
-    });
+            const res = await request(app).delete("/kategori/99");
 
-    test("POST /kategori-produk harus menambahkan kategori baru", async () => {
-        const res = await request(app)
-            .post("/kategori-produk")
-            .send({ nama_kategori: "Aksesoris" });
-
-        expect(res.statusCode).toBe(201);
-        expect(res.body.success).toBe(true);
-        expect(res.body.data.nama_kategori).toBe("Aksesoris");
-    });
-
-    test("GET /kategori-produk harus mengembalikan daftar kategori", async () => {
-        const res = await request(app).get("/kategori-produk");
-
-        expect(res.statusCode).toBe(200);
-        expect(res.body.success).toBe(true);
-        expect(res.body.data.length).toBeGreaterThan(0);
-    });
-
-    test("PUT /kategori-produk/:id harus mengupdate kategori", async () => {
-        const kategori = await KategoriProduk.create({ nama_kategori: "Gadget" });
-
-        const res = await request(app)
-            .put(`/kategori-produk/${kategori.id_kategori}`)
-            .send({ nama_kategori: "Smartphone" });
-
-        expect(res.statusCode).toBe(200);
-        expect(res.body.success).toBe(true);
-        expect(res.body.message).toBe("Kategori berhasil diperbarui");
-    });
-
-    test("DELETE /kategori-produk/:id harus menghapus kategori", async () => {
-        const kategori = await KategoriProduk.create({ nama_kategori: "HapusKategori" });
-
-        const res = await request(app).delete(`/kategori-produk/${kategori.id_kategori}`);
-
-        expect(res.statusCode).toBe(200);
-        expect(res.body.success).toBe(true);
-
-        const cekKategori = await KategoriProduk.findByPk(kategori.id_kategori);
-        expect(cekKategori).toBeNull();
+            expect(res.statusCode).toBe(404);
+            expect(res.body.message).toBe("Kategori tidak ditemukan");
+        });
     });
 });
