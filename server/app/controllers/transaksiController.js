@@ -104,7 +104,7 @@ exports.getTransaksiById = async (req, res) => {
                         {
                             model: Produk,
                             as: "produk",
-                            attributes: ["kode_barang", "nama_barang", "harga_jual"],
+                            attributes: ["kode_barang", "nama_barang"],
                         },
                     ],
                 },
@@ -125,70 +125,6 @@ exports.getTransaksiById = async (req, res) => {
         });
     } catch (error) {
         console.error("Error saat mengambil transaksi:", error);
-        res.status(500).json({
-            success: false,
-            message: "Terjadi kesalahan pada server",
-            error: error.message,
-        });
-    }
-};
-
-// Endpoint khusus untuk print dengan format yang sudah dioptimalkan
-exports.getPrintData = async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const transaksi = await Transaksi.findByPk(id, {
-            include: [
-                {
-                    model: DetailTransaksi,
-                    as: "detail_transaksi",
-                    include: [
-                        {
-                            model: Produk,
-                            as: "produk",
-                            attributes: ["kode_barang", "nama_barang"],
-                        },
-                    ],
-                },
-            ],
-        });
-
-        if (!transaksi) {
-            return res.status(404).json({
-                success: false,
-                message: "Transaksi tidak ditemukan",
-            });
-        }
-
-        // Format data untuk print dengan informasi lengkap
-        const printData = {
-            id_transaksi: transaksi.id_transaksi,
-            tanggal: transaksi.tanggal,
-            total_harga: parseFloat(transaksi.total_harga),
-            metode_pembayaran: transaksi.metode_pembayaran,
-            detail_transaksi: transaksi.detail_transaksi.map(detail => ({
-                kode_barang: detail.kode_barang,
-                jumlah: detail.jumlah,
-                harga_satuan: parseFloat(detail.harga_satuan),
-                subtotal: parseFloat(detail.subtotal),
-                produk: {
-                    nama_barang: detail.produk.nama_barang,
-                    kode_barang: detail.produk.kode_barang
-                }
-            })),
-            // Informasi tambahan untuk print
-            total_item: transaksi.detail_transaksi.reduce((sum, detail) => sum + detail.jumlah, 0),
-            created_at: new Date().toISOString()
-        };
-
-        res.json({
-            success: true,
-            message: "Data print berhasil diambil",
-            data: printData,
-        });
-    } catch (error) {
-        console.error("Error saat mengambil data print:", error);
         res.status(500).json({
             success: false,
             message: "Terjadi kesalahan pada server",
@@ -219,6 +155,83 @@ exports.deleteTransaksi = async (req, res) => {
         });
     } catch (error) {
         console.error("Error saat menghapus transaksi:", error);
+        res.status(500).json({
+            success: false,
+            message: "Terjadi kesalahan pada server",
+            error: error.message,
+        });
+    }
+};
+
+exports.getPrintData = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Query untuk mengambil data transaksi beserta detail dan produk terkait
+        const transaksi = await Transaksi.findByPk(id, {
+            include: [
+                {
+                    model: DetailTransaksi,
+                    as: "detail_transaksi",
+                    include: [
+                        {
+                            model: Produk,
+                            as: "produk",
+                            attributes: ["kode_barang", "nama_barang", "harga_jual", "harga_grosir", "batas_grosir"],
+                        },
+                    ],
+                },
+            ],
+        });
+
+        // Jika transaksi tidak ditemukan
+        if (!transaksi) {
+            return res.status(404).json({
+                success: false,
+                message: "Transaksi tidak ditemukan",
+            });
+        }
+
+        // Format data untuk keperluan cetak
+        const printData = {
+            id_transaksi: transaksi.id_transaksi,
+            tanggal: transaksi.tanggal,
+            total_harga: parseFloat(transaksi.total_harga),
+            metode_pembayaran: transaksi.metode_pembayaran,
+            detail_transaksi: transaksi.detail_transaksi.map((detail) => ({
+                kode_barang: detail.kode_barang,
+                jumlah: detail.jumlah,
+                harga_satuan: detail.harga_satuan,
+                subtotal: detail.subtotal,
+                produk: detail.produk ? {
+                    nama_barang: detail.produk.nama_barang,
+                    kode_barang: detail.produk.kode_barang,
+                    harga_jual: detail.produk.harga_jual,
+                    harga_grosir: detail.produk.harga_grosir,
+                    batas_grosir: detail.produk.batas_grosir
+                } : {
+                    nama_barang: "Barang tidak ditemukan",
+                    kode_barang: "N/A",
+                    harga_jual: 0,
+                    harga_grosir: 0,
+                    batas_grosir: 0,
+                },
+            })),
+            total_item: transaksi.detail_transaksi.reduce((sum, detail) => sum + detail.jumlah, 0),
+            created_at: new Date().toISOString(),
+        };
+
+        // debugging print Data
+        console.log("Data untuk cetak:", printData);
+
+        // Kirim respons dengan data yang diformat
+        res.json({
+            success: true,
+            message: "Data print berhasil diambil",
+            data: printData,
+        });
+    } catch (error) {
+        console.error("Error saat mengambil data print:", error);
         res.status(500).json({
             success: false,
             message: "Terjadi kesalahan pada server",

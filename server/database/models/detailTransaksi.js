@@ -54,6 +54,7 @@ module.exports = (sequelize, DataTypes) => {
 
         DetailTransaksi.belongsTo(models.Produk, {
             foreignKey: "kode_barang",
+            targetKey: "kode_barang",
             as: "produk",
             onUpdate: "CASCADE",
             onDelete: "CASCADE",

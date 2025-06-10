@@ -2,11 +2,12 @@
 class AdvancedThermalPrintService {
     constructor() {
         this.pageWidth = 48; // Lebar kertas thermal 58mm
+        this.margin = 2; // Margin kiri-kanan dalam mm
         this.companyInfo = {
-            name: "TOKO SAYA",
-            address: "Jl. Contoh No. 123",
-            city: "Bandung, Jawa Barat",
-            phone: "Telp: 022-1234567"
+            name: "BUBUN ELEKTRONIK",
+            address: "Dawuan, Kec. Dawuan",
+            city: "Kabupaten Majalengka, Jawa Barat",
+            phone: "Telp: 0818-191-067"
         };
         
         // ESC/POS Commands
@@ -29,19 +30,20 @@ class AdvancedThermalPrintService {
 
     // Fungsi untuk membuat garis pemisah
     createSeparatorLine(char = '-') {
-        return char.repeat(this.pageWidth);
+        const separator = char.repeat(this.pageWidth - this.margin * 2);
+        return separator;
     }
 
     // Fungsi untuk memusatkan teks
     centerText(text) {
-        const padding = Math.max(0, Math.floor((this.pageWidth - text.length) / 2));
-        return ' '.repeat(padding) + text;
+        const padding = Math.max(0, Math.floor((this.pageWidth - text.length - this.margin * 2) / 2));
+        return ' '.repeat(padding) + text + ' '.repeat(this.margin);
     }
 
     // Fungsi untuk membuat baris dengan alignment kiri-kanan
     createLeftRightLine(left, right) {
         const totalLength = left.length + right.length;
-        const spaces = Math.max(1, this.pageWidth - totalLength);
+        const spaces = Math.max(1, this.pageWidth - totalLength - this.margin * 2);
         return left + ' '.repeat(spaces) + right;
     }
 
@@ -260,35 +262,46 @@ class AdvancedThermalPrintService {
                             font-size: 11px;
                             line-height: 1.3;
                             margin: 0;
-                            padding: 2mm;
+                            padding: 5mm;
                             white-space: pre-wrap;
                             word-wrap: break-word;
                             color: #000;
-                            background: #fff;
+                            background: #f9f9f9; /* Latar belakang yang lebih lembut */
                         }
                         @media print {
                             body {
-                                font-size: 9px;
+                                font-size: 10px;
                                 line-height: 1.2;
                             }
                             .no-print {
                                 display: none;
                             }
                         }
+                        .receipt-container {
+                            margin: 0 auto;
+                            max-width: 70mm;
+                            background: #fff;
+                            padding: 10mm; /* Tambahkan padding untuk ruang lebih */
+                            border: 1px solid #ddd;
+                            border-radius: 8px; /* Sudut yang lebih halus */
+                            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Shadow yang lebih lembut */
+                        }
                         .print-button {
                             position: fixed;
-                            top: 10px;
-                            right: 10px;
-                            background: #007bff;
+                            bottom: 20px;
+                            right: 20px;
+                            background: #28a745;
                             color: white;
                             border: none;
-                            padding: 10px 15px;
+                            padding: 10px 20px;
                             border-radius: 4px;
                             cursor: pointer;
                             font-size: 14px;
+                            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                            transition: background 0.3s ease;
                         }
                         .print-button:hover {
-                            background: #0056b3;
+                            background: #218838;
                         }
                     </style>
                 </head>
@@ -296,7 +309,9 @@ class AdvancedThermalPrintService {
                     <button class="print-button no-print" onclick="window.print()">
                         🖨️ Cetak Struk
                     </button>
-                    <div id="receipt">${receiptText}</div>
+                    <div class="receipt-container">
+                        <pre>${receiptText}</pre>
+                    </div>
                 </body>
                 </html>
             `);
@@ -415,3 +430,4 @@ class AdvancedThermalPrintService {
 }
 
 export default AdvancedThermalPrintService;
+

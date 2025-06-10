@@ -29,7 +29,7 @@ const TransaksiTable = ({ data, onDetail, onDelete, onPrint, startIndex = 0 }) =
                         <th scope="col" className="px-6 py-3">
                             Metode Pembayaran
                         </th>
-                        <th scope="col" className="px-6 py-3 text-right">
+                        <th scope="col" className="px-6 py-3 text-center">
                             Action
                         </th>
                     </tr>

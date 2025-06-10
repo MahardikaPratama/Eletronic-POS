@@ -59,6 +59,8 @@ module.exports = (sequelize, DataTypes) => {
         });
         Produk.hasMany(models.DetailTransaksi, {
             foreignKey: "kode_barang",
+            sourceKey: "kode_barang",
+            as: 'detail_transaksi',
             onDelete: "CASCADE",
         });
     };

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { BiCategory, BiBarChartAlt } from "react-icons/bi";
-import { FiPackage, FiSettings, FiLogOut } from "react-icons/fi";
+import { FiPackage, FiLogOut } from "react-icons/fi";
 import { FaMoneyBillWave, FaStore } from "react-icons/fa";
 import { RiBillFill } from "react-icons/ri";
 import "../styles/sidebar.css";
@@ -207,20 +207,6 @@ const Sidebar = () => {
                             <span className="block px-2 text-sm font-medium text-gray-500 uppercase">
                                 Other
                             </span>
-                        </li>
-                        <li>
-                            <a
-                                href="#"
-                                onClick={() => handleLinkClick("setting")}
-                                className={`flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100 group ${
-                                    activeLink === "setting"
-                                        ? "bg-red-500 text-white"
-                                        : ""
-                                }`}
-                            >
-                                <FiSettings className="w-5 h-5 text-gray-300 transition duration-75 group-hover:text-white" />
-                                <span className="ms-3">Setting</span>
-                            </a>
                         </li>
                         <li>
                             <a

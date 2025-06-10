@@ -49,8 +49,9 @@ const MainContentTransaksi = () => {
             });
 
             // Ambil detail transaksi lengkap
-            const response = await TransaksiDataService.getById(transaksi.id_transaksi);
+            const response = await TransaksiDataService.getPrintData(transaksi.id_transaksi);
             const transaksiLengkap = response.data.data;
+            console.log('Detail transaksi:', transaksiLengkap.detail_transaksi);
 
             // Tutup loading
             Swal.close();
@@ -63,15 +64,15 @@ const MainContentTransaksi = () => {
                 showCancelButton: true,
                 showDenyButton: true,
                 confirmButtonText: '🖨️ Printer Default',
-                denyButtonText: '👁️ Preview Dulu',
-                cancelButtonText: '❌ Batal',
+                denyButtonText: '👁️ Preview',
+                cancelButtonText: 'Batal',
                 confirmButtonColor: '#28a745',
                 denyButtonColor: '#17a2b8',
-                cancelButtonColor: '#6c757d',
+                cancelButtonColor: '#dc3545',
                 html: `
                     <div style="text-align: left; margin: 15px 0;">
                         <p><strong>🖨️ Printer Default:</strong> Cetak langsung ke printer thermal yang terpasang</p>
-                        <p><strong>👁️ Preview Dulu:</strong> Lihat tampilan struk sebelum mencetak</p>
+                        <p><strong>👁️ Preview:</strong> Lihat tampilan struk sebelum mencetak</p>
                     </div>
                 `
             });
