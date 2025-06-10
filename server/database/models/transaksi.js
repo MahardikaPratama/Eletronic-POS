@@ -31,6 +31,7 @@ module.exports = (sequelize, DataTypes) => {
     Transaksi.associate = (models) => {
         Transaksi.hasMany(models.DetailTransaksi, {
             foreignKey: "id_transaksi",
+            as: "detail_transaksi",
             onDelete: "CASCADE",
         });
     };

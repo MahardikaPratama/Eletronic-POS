@@ -47,7 +47,7 @@ module.exports = (sequelize, DataTypes) => {
     DetailTransaksi.associate = (models) => {
         DetailTransaksi.belongsTo(models.Transaksi, {
             foreignKey: "id_transaksi",
-            as: "transaksi",
+            as: "detail_transaksi",
             onUpdate: "CASCADE",
             onDelete: "CASCADE",
         });

@@ -13,8 +13,6 @@ class KategoriProdukDataService {
 
     // 🛠️ Handler untuk UPDATE kategori
     update(id, data) {
-        console.log("id:", id);
-        console.log("data:", data);
         return http.put(`/kategori-produk/${id}`, JSON.stringify(data), {
             headers: {
                 "Content-Type": "application/json"

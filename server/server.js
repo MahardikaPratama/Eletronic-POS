@@ -21,9 +21,13 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 const kategoriProdukRoutes = require('./app/routes/kategoriProdukRoute');
 const produkRoutes = require('./app/routes/produkRoute');
+const pengeluaranRoutes = require('./app/routes/pengeluaranRoute');
+const transaksiRoutes = require("./app/routes/transaksiRoute");
 
 app.use('/api/v1/kategori-produk', kategoriProdukRoutes);
 app.use('/api/v1/produk', produkRoutes);
+app.use('/api/v1/pengeluaran', pengeluaranRoutes);
+app.use('/api/v1/transaksi', transaksiRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

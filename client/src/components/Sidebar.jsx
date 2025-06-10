@@ -136,7 +136,7 @@ const Sidebar = () => {
                         </li>
                         <li>
                             <a
-                                href="#"
+                                href="/dashboard/transactions"
                                 onClick={() => handleLinkClick("transaksi")}
                                 className={`flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100 group ${
                                     activeLink === "transaksi"
@@ -150,7 +150,7 @@ const Sidebar = () => {
                         </li>
                         <li>
                             <a
-                                href="#"
+                                href="/dashboard/laporan-pengeluaran"
                                 onClick={() => handleLinkClick("pengeluaran")}
                                 className={`flex items-center p-2 text-gray-600 rounded-lg hover:bg-gray-100 group ${
                                     activeLink === "pengeluaran"

@@ -73,7 +73,7 @@ const MainContent = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    await Produk.delete(product.kode_barang);
+                    await Produk.delete(product.id_barang);
                     fetchData();
                     Swal.fire('Dihapus!', 'Produk telah berhasil dihapus.', 'success');
                 } catch (error) {
